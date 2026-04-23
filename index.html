@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mon Inventaire Cuisine</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1923;
+    --panel: #1a2535;
+    --panel2: #212f42;
+    --accent: #3b9eff;
+    --accent2: #ff4757;
+    --text: #e8f0fb;
+    --muted: #7a90a8;
+    --border: #2a3a50;
+    --boeuf: #e74c3c;
+    --porc: #e67e22;
+    --poulet: #f1c40f;
+    --poisson: #3498db;
+    --sauces: #2ecc71;
+    --congelateur: #3b9eff;
+    --frigo: #2ecc71;
+    --gardmanger: #e67e22;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Mono', monospace;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* AUTH SCREEN */
+  #auth-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    gap: 2rem;
+    padding: 2rem;
+  }
+
+  .auth-logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--text);
+    text-align: center;
+  }
+  .auth-logo span { color: var(--accent); }
+
+  .auth-subtitle {
+    color: var(--muted);
+    font-size: 0.9rem;
+    text-align: center;
+  }
+
+  .btn-google {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: white;
+    color: #333;
+    border: none;
+    border-radius: 12px;
+    padding: 0.9rem 2rem;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+  .btn-google:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.4); }
+  .btn-google img { width: 24px; }
+
+  /* MAIN APP */
+  #app { display: none; }
+
+  /* TOP NAV */
+  .topnav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .topnav-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: var(--text);
+  }
+  .topnav-title span { color: var(--accent); }
+
+  .topnav-user {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+  }
+
+  .btn-logout {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 8px;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.75rem;
+    cursor: pointer;
+    font-family: 'DM Mono', monospace;
+    transition: all 0.15s;
+  }
+  .btn-logout:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  /* SECTION TABS */
+  .tabs {
+    display: flex;
+    gap: 0.5rem;
+    padding: 1rem 1.5rem;
+    overflow-x: auto;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tab {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+
+  .tab.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+
+  .tab:hover:not(.active) { border-color: var(--accent); color: var(--accent); }
+
+  /* CONTENT */
+  .content {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 1.5rem;
+  }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* CATEGORY */
+  .category {
+    background: var(--panel);
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    margin-bottom: 1rem;
+  }
+
+  .cat-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.9rem 1.25rem;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: white;
+    cursor: pointer;
+    user-select: none;
+  }
+  .cat-header .toggle { margin-left: auto; opacity: 0.7; }
+
+  .item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  .item:last-child { border-bottom: none; }
+  .item:hover { background: var(--panel2); }
+
+  .item-name { flex: 1; font-size: 0.85rem; }
+
+  .item-unit {
+    font-size: 0.72rem;
+    color: var(--muted);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.1rem 0.5rem;
+    min-width: 55px;
+    text-align: center;
+  }
+
+  .qty-controls { display: flex; align-items: center; gap: 0.4rem; }
+
+  .qty-btn {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .qty-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .qty-btn.minus:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  .qty-value {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    min-width: 28px;
+    text-align: center;
+  }
+  .qty-value.zero { color: var(--muted); }
+
+  .delete-btn {
+    width: 26px; height: 26px;
+    border-radius: 6px; border: none;
+    background: transparent; cursor: pointer;
+    color: var(--border); font-size: 1rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .delete-btn:hover { color: var(--accent2); background: rgba(255,71,87,0.1); }
+
+  .add-row {
+    display: flex; gap: 0.5rem;
+    padding: 0.6rem 1.25rem 0.8rem;
+    border-top: 1px dashed var(--border);
+    flex-wrap: wrap;
+  }
+
+  .add-row input {
+    flex: 1; min-width: 120px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 0.4rem 0.7rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.82rem;
+    outline: none;
+    background: var(--bg);
+    color: var(--text);
+    transition: border 0.15s;
+  }
+  .add-row input:focus { border-color: var(--accent); }
+
+  .add-row button {
+    padding: 0.4rem 0.9rem;
+    border-radius: 8px; border: none;
+    background: var(--accent); color: white;
+    font-family: 'Syne', sans-serif;
+    font-weight: 600; font-size: 0.82rem;
+    cursor: pointer; transition: opacity 0.15s;
+  }
+  .add-row button:hover { opacity: 0.85; }
+
+  .hidden { display: none; }
+
+  /* LOADING */
+  .loading {
+    text-align: center;
+    padding: 3rem;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  /* ÉPICERIE */
+  .epicerie-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.7rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  .epicerie-item:hover { background: var(--panel2); }
+  .epicerie-item input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: var(--accent); }
+  .epicerie-item label { flex: 1; font-size: 0.88rem; cursor: pointer; }
+  .epicerie-item label.checked { text-decoration: line-through; color: var(--muted); }
+
+  .epicerie-cat {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: var(--muted);
+    padding: 0.5rem 1.25rem 0.2rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .btn-clear {
+    background: var(--accent2);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 0.6rem 1.2rem;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    margin: 1rem 0;
+    transition: opacity 0.15s;
+  }
+  .btn-clear:hover { opacity: 0.85; }
+
+  .add-epicerie {
+    display: flex; gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  .add-epicerie input {
+    flex: 1;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 0.6rem 1rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem;
+    outline: none;
+    background: var(--panel);
+    color: var(--text);
+    transition: border 0.15s;
+  }
+  .add-epicerie input:focus { border-color: var(--accent); }
+  .add-epicerie button {
+    padding: 0.6rem 1rem;
+    border-radius: 10px; border: none;
+    background: var(--accent); color: white;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700; font-size: 0.85rem;
+    cursor: pointer;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.3rem;
+    margin-bottom: 1.2rem;
+    color: var(--text);
+  }
+
+  .status-msg {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.8rem;
+    padding: 0.5rem;
+    animation: fadeout 2s forwards;
+    animation-delay: 1s;
+  }
+  @keyframes fadeout { to { opacity: 0; } }
+</style>
+</head>
+<body>
+
+<!-- AUTH -->
+<div id="auth-screen">
+  <div class="auth-logo">❄️ Mon<span>Inventaire</span></div>
+  <div class="auth-subtitle">Gérez votre cuisine facilement</div>
+  <button class="btn-google" id="btn-login">
+    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+    Connexion avec Google
+  </button>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <nav class="topnav">
+    <div class="topnav-title">❄️ Mon<span>Inventaire</span></div>
+    <div class="topnav-user">
+      <img class="user-avatar" id="user-avatar" src="" alt="">
+      <button class="btn-logout" id="btn-logout">Déconnexion</button>
+    </div>
+  </nav>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="congelateur">❄️ Congélateur</button>
+    <button class="tab" data-tab="frigo">🥬 Frigo</button>
+    <button class="tab" data-tab="gardmanger">🥫 Garde-Manger</button>
+    <button class="tab" data-tab="epicerie">🛒 Épicerie</button>
+  </div>
+
+  <div class="content">
+    <!-- CONGÉLATEUR -->
+    <div class="section active" id="tab-congelateur">
+      <div id="congelateur-content"><div class="loading">Chargement...</div></div>
+    </div>
+
+    <!-- FRIGO -->
+    <div class="section" id="tab-frigo">
+      <div id="frigo-content"><div class="loading">Chargement...</div></div>
+    </div>
+
+    <!-- GARDE-MANGER -->
+    <div class="section" id="tab-gardmanger">
+      <div id="gardmanger-content"><div class="loading">Chargement...</div></div>
+    </div>
+
+    <!-- ÉPICERIE -->
+    <div class="section" id="tab-epicerie">
+      <div class="section-title">🛒 Liste d'Épicerie</div>
+      <div class="add-epicerie">
+        <input type="text" id="epicerie-input" placeholder="Ajouter un item..." />
+        <button onclick="addEpicerieItem()">+ Ajouter</button>
+      </div>
+      <button class="btn-clear" onclick="clearChecked()">🗑️ Effacer les cochés</button>
+      <div id="epicerie-list" class="category"></div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, addDoc, deleteDoc, updateDoc }
+  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAuxEZ6GPLPSR_01vh7pIZU-HcaGL3fCbs",
+  authDomain: "cuisine-ff911.firebaseapp.com",
+  projectId: "cuisine-ff911",
+  storageBucket: "cuisine-ff911.firebasestorage.app",
+  messagingSenderId: "796308500895",
+  appId: "1:796308500895:web:4ef46abd88ac6514e70daa",
+  measurementId: "G-WSHMP0G0R5"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// ---- AUTH ----
+document.getElementById('btn-login').onclick = () => {
+  signInWithPopup(auth, new GoogleAuthProvider());
+};
+document.getElementById('btn-logout').onclick = () => signOut(auth);
+
+onAuthStateChanged(auth, user => {
+  if (user) {
+    document.getElementById('auth-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('user-avatar').src = user.photoURL || '';
+    loadAll(user.uid);
+  } else {
+    document.getElementById('auth-screen').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+  }
+});
+
+// ---- TABS ----
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.onclick = () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+  };
+});
+
+// ---- DEFAULT DATA ----
+const DEFAULT_DATA = {
+  congelateur: {
+    boeuf: { label: "🥩 Bœuf", color: "#e74c3c", items: [
+      { name: "Steak Haché Bœuf", qty: 5, unit: "sac ziploc" },
+      { name: "Cubes de Bœuf", qty: 4, unit: "unité" },
+      { name: "Boulette Hamburger", qty: 1, unit: "unité" },
+      { name: "Boulettes Ryan", qty: 4, unit: "unité" },
+      { name: "Boulettes Éric", qty: 4, unit: "unité" },
+      { name: "Bifteck Attendri", qty: 2, unit: "unité" },
+      { name: "Steaks Minutes", qty: 10, unit: "unité" },
+      { name: "Rôti Contre-Filet", qty: 2, unit: "unité" },
+      { name: "Rôti Haut de Surlonge Désossé Régulier", qty: 1, unit: "unité" },
+      { name: "Fondue", qty: 1, unit: "unité" },
+      { name: "Tournedos", qty: 1, unit: "unité" },
+    ]},
+    porc: { label: "🐷 Porc", color: "#e67e22", items: [
+      { name: "Filet de Porc", qty: 1, unit: "filet" },
+      { name: "Paquets de Bacon", qty: 5, unit: "paquet" },
+      { name: "Pepperoni", qty: 1, unit: "petit ziploc" },
+      { name: "Pepperoni Épicé", qty: 3, unit: "petit ziploc" },
+      { name: "Porc haché", qty: 3, unit: "unité" },
+    ]},
+    poulet: { label: "🍗 Poulet", color: "#d4a017", items: [
+      { name: "Poitrines de Poulet", qty: 6, unit: "unité" },
+      { name: "Hauts de Cuisse de Poulet", qty: 6, unit: "unité" },
+      { name: "Cuisses de Poulet", qty: 2, unit: "unité" },
+      { name: "Ailes de Poulet (Sélection)", qty: 2, unit: "boîte" },
+      { name: "Poulet Pop Corn", qty: 20, unit: "unité" },
+      { name: "Poulet Médaillon Bacon", qty: 0, unit: "unité" },
+    ]},
+    poisson: { label: "🐟 Poisson", color: "#2980b9", items: [
+      { name: "Filets de Sole", qty: 4, unit: "unité" },
+    ]},
+    sauces: { label: "🍝 Plats / Sauces", color: "#27ae60", items: [
+      { name: "Sauce à Spaghetti", qty: 1, unit: "pot ziploc" },
+      { name: "Coulis de Tomate", qty: 5, unit: "petit ziploc" },
+      { name: "Soupe aux Légumes", qty: 1, unit: "pot ziploc" },
+      { name: "Sauce brune", qty: 1, unit: "unité" },
+    ]},
+  },
+  frigo: {
+    legumes: { label: "🥬 Légumes & Fruits", color: "#27ae60", items: [] },
+    laitiers: { label: "🧀 Produits Laitiers", color: "#f39c12", items: [] },
+    autres: { label: "🍳 Autres", color: "#8e44ad", items: [] },
+  },
+  gardmanger: {
+    conserves: { label: "🥫 Conserves", color: "#e67e22", items: [] },
+    pates: { label: "🍝 Pâtes & Riz", color: "#c0392b", items: [] },
+    epicerie: { label: "🧂 Épices & Condiments", color: "#16a085", items: [] },
+  }
+};
+
+// ---- LOAD ALL ----
+async function loadAll(uid) {
+  for (const section of ['congelateur', 'frigo', 'gardmanger']) {
+    const ref = doc(db, 'users', uid, 'inventaire', section);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) {
+      await setDoc(ref, DEFAULT_DATA[section]);
+    }
+    onSnapshot(ref, d => {
+      if (d.exists()) renderSection(section, d.data(), uid);
+    });
+  }
+  loadEpicerie(uid);
+}
+
+// ---- RENDER SECTION ----
+function renderSection(section, data, uid) {
+  const container = document.getElementById(section + '-content');
+  container.innerHTML = '';
+  for (const [catKey, cat] of Object.entries(data)) {
+    const div = document.createElement('div');
+    div.className = 'category';
+
+    const header = document.createElement('div');
+    header.className = 'cat-header';
+    header.style.background = cat.color;
+    header.innerHTML = `<span>${cat.label}</span><span class="toggle">▲</span>`;
+    header.onclick = () => {
+      body.classList.toggle('hidden');
+      header.querySelector('.toggle').textContent = body.classList.contains('hidden') ? '▼' : '▲';
+    };
+
+    const body = document.createElement('div');
+    body.className = 'cat-body';
+
+    (cat.items || []).forEach((item, idx) => {
+      const row = document.createElement('div');
+      row.className = 'item';
+      row.innerHTML = `
+        <span class="item-name">${item.name}</span>
+        <span class="item-unit">${item.unit || ''}</span>
+        <div class="qty-controls">
+          <button class="qty-btn minus">−</button>
+          <span class="qty-value ${item.qty === 0 ? 'zero' : ''}">${item.qty}</span>
+          <button class="qty-btn plus">+</button>
+        </div>
+        <button class="delete-btn">✕</button>
+      `;
+      row.querySelector('.minus').onclick = () => updateQty(uid, section, catKey, data, idx, -1);
+      row.querySelector('.plus').onclick  = () => updateQty(uid, section, catKey, data, idx, 1);
+      row.querySelector('.delete-btn').onclick = () => {
+        if (confirm(`Supprimer "${item.name}" ?`)) deleteItem(uid, section, catKey, data, idx);
+      };
+      body.appendChild(row);
+    });
+
+    // Add row
+    const addRow = document.createElement('div');
+    addRow.className = 'add-row';
+    addRow.innerHTML = `
+      <input type="text" placeholder="Ajouter un item..." class="add-name"/>
+      <input type="text" placeholder="unité" style="width:80px;" class="add-unit"/>
+      <button>+ Ajouter</button>
+    `;
+    addRow.querySelector('button').onclick = () => {
+      const name = addRow.querySelector('.add-name').value.trim();
+      const unit = addRow.querySelector('.add-unit').value.trim();
+      if (!name) return;
+      const newItems = [...(data[catKey].items || []), { name, qty: 1, unit }];
+      saveCategory(uid, section, catKey, data, newItems);
+      addRow.querySelector('.add-name').value = '';
+      addRow.querySelector('.add-unit').value = '';
+    };
+
+    body.appendChild(addRow);
+    div.appendChild(header);
+    div.appendChild(body);
+    container.appendChild(div);
+  }
+}
+
+async function updateQty(uid, section, catKey, data, idx, delta) {
+  const items = [...data[catKey].items];
+  items[idx] = { ...items[idx], qty: Math.max(0, items[idx].qty + delta) };
+  saveCategory(uid, section, catKey, data, items);
+}
+
+async function deleteItem(uid, section, catKey, data, idx) {
+  const items = data[catKey].items.filter((_, i) => i !== idx);
+  saveCategory(uid, section, catKey, data, items);
+}
+
+async function saveCategory(uid, section, catKey, data, newItems) {
+  const ref = doc(db, 'users', uid, 'inventaire', section);
+  await updateDoc(ref, { [`${catKey}.items`]: newItems });
+}
+
+// ---- ÉPICERIE ----
+let epicerieUid = null;
+function loadEpicerie(uid) {
+  epicerieUid = uid;
+  const ref = collection(db, 'users', uid, 'epicerie');
+  onSnapshot(ref, snap => {
+    const list = document.getElementById('epicerie-list');
+    list.innerHTML = '';
+    snap.forEach(d => {
+      const item = d.data();
+      const row = document.createElement('div');
+      row.className = 'epicerie-item';
+      const id = `chk-${d.id}`;
+      row.innerHTML = `
+        <input type="checkbox" id="${id}" ${item.checked ? 'checked' : ''}/>
+        <label for="${id}" class="${item.checked ? 'checked' : ''}">${item.name}</label>
+        <button class="delete-btn" style="color:var(--muted)">✕</button>
+      `;
+      row.querySelector('input').onchange = async (e) => {
+        await updateDoc(doc(db, 'users', uid, 'epicerie', d.id), { checked: e.target.checked });
+      };
+      row.querySelector('.delete-btn').onclick = async () => {
+        await deleteDoc(doc(db, 'users', uid, 'epicerie', d.id));
+      };
+      list.appendChild(row);
+    });
+  });
+}
+
+window.addEpicerieItem = async () => {
+  const input = document.getElementById('epicerie-input');
+  const name = input.value.trim();
+  if (!name || !epicerieUid) return;
+  await addDoc(collection(db, 'users', epicerieUid, 'epicerie'), { name, checked: false });
+  input.value = '';
+};
+
+window.clearChecked = async () => {
+  const ref = collection(db, 'users', epicerieUid, 'epicerie');
+  const snap = await getDoc(doc(db, 'users', epicerieUid, 'inventaire', 'congelateur'));
+  // clear checked items from epicerie
+  const { getDocs } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+  const items = await getDocs(collection(db, 'users', epicerieUid, 'epicerie'));
+  items.forEach(async d => {
+    if (d.data().checked) await deleteDoc(d.ref);
+  });
+};
+
+// Enter key for epicerie
+document.getElementById('epicerie-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') window.addEpicerieItem();
+});
+</script>
+</body>
+</html>
