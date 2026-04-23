@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CuisineHQ</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Playfair+Display:wght@700;900&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --g0: #FFF8E7;
+    --g1: #F9E07F;
+    --g2: #F4A623;
+    --g3: #C47D0E;
+    --g4: #8A5600;
+    --g5: #3A2000;
+    --bg: #080601;
+    --panel: #0e0b02;
+    --panel2: #151005;
+    --accent: #F4A623;
+    --accent2: #C47D0E;
+    --text: #FFF8E7;
+    --muted: #8A5600;
+    --border: #2a1f05;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Mono', monospace;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── AUTH ── */
+  #auth-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    gap: 1.8rem;
+    padding: 2rem;
+    background: radial-gradient(ellipse at center, #120d02 0%, #080601 70%);
+  }
+
+  .auth-logo { display: flex; flex-direction: column; align-items: center; gap: 0.1rem; }
+  .auth-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.55em;
+    color: var(--g4);
+    text-transform: uppercase;
+    margin-right: -0.55em;
+  }
+  .auth-hq {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-size: 5.5rem;
+    line-height: 0.85;
+    background: linear-gradient(180deg, var(--g0) 0%, var(--g1) 25%, var(--g2) 55%, var(--g3) 80%, var(--g4) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .auth-tagline {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 1rem;
+    color: var(--g4);
+    letter-spacing: 0.06em;
+  }
+
+  .auth-rule { display: flex; align-items: center; gap: 8px; width: 160px; }
+  .auth-rule-line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--g4)); }
+  .auth-rule-line.r { background: linear-gradient(90deg, var(--g4), transparent); }
+  .auth-rule-gem { width: 5px; height: 5px; background: var(--g2); transform: rotate(45deg); }
+
+  .btn-google {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: #0e0b02;
+    color: var(--g1);
+    border: 1px solid var(--g4);
+    border-radius: 6px;
+    padding: 0.85rem 2rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 0 20px rgba(244,166,35,0.08);
+  }
+  .btn-google:hover {
+    background: #161005;
+    border-color: var(--g2);
+    box-shadow: 0 0 30px rgba(244,166,35,0.18);
+    color: var(--g0);
+  }
+  .btn-google img { width: 18px; opacity: 0.8; }
+
+  /* ── APP ── */
+  #app { display: none; }
+
+  /* ── TOP NAV ── */
+  .topnav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.7rem 1.5rem;
+    background: #060401;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .topnav-logo { display: flex; flex-direction: column; line-height: 1; }
+  .topnav-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.45rem;
+    letter-spacing: 0.45em;
+    color: var(--g5);
+    text-transform: uppercase;
+  }
+  .topnav-hq {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-size: 1.25rem;
+    background: linear-gradient(135deg, var(--g1), var(--g2), var(--g3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+  }
+
+  .topnav-user { display: flex; align-items: center; gap: 0.5rem; }
+  .user-avatar { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--g4); }
+
+  .btn-logout {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 4px;
+    padding: 0.25rem 0.6rem;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    font-family: 'DM Mono', monospace;
+    transition: all 0.15s;
+    text-transform: uppercase;
+  }
+  .btn-logout:hover { border-color: var(--g4); color: var(--g2); }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex;
+    gap: 0.4rem;
+    padding: 0.7rem 1.5rem;
+    overflow-x: auto;
+    background: #060401;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tab {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.85rem;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .tab.active {
+    background: #151005;
+    border-color: var(--g4);
+    color: var(--g1);
+    box-shadow: 0 0 10px rgba(244,166,35,0.1);
+  }
+  .tab:hover:not(.active) { border-color: var(--g5); color: var(--g3); }
+
+  /* ── CONTENT ── */
+  .content { max-width: 760px; margin: 0 auto; padding: 1.5rem; }
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ── CATEGORY ── */
+  .category {
+    background: var(--panel);
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    margin-bottom: 0.75rem;
+  }
+
+  .cat-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.25rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    color: var(--g0);
+    cursor: pointer;
+    user-select: none;
+    font-weight: 500;
+  }
+  .cat-header .toggle { margin-left: auto; opacity: 0.5; font-size: 0.7rem; }
+
+  .item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.55rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  .item:last-child { border-bottom: none; }
+  .item:hover { background: var(--panel2); }
+
+  .item-name { flex: 1; font-size: 0.8rem; color: var(--g0); }
+
+  .item-unit {
+    font-size: 0.65rem;
+    color: var(--muted);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.1rem 0.45rem;
+    min-width: 50px;
+    text-align: center;
+  }
+
+  .qty-controls { display: flex; align-items: center; gap: 0.35rem; }
+
+  .qty-btn {
+    width: 26px; height: 26px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--muted);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .qty-btn:hover { border-color: var(--g3); color: var(--g2); }
+  .qty-btn.minus:hover { border-color: var(--g5); color: var(--g4); }
+
+  .qty-value {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 1rem;
+    min-width: 26px;
+    text-align: center;
+    color: var(--g1);
+  }
+  .qty-value.zero { color: var(--g5); }
+
+  .cart-btn {
+    width: 26px; height: 26px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: var(--muted);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .cart-btn:hover {
+    border-color: var(--g3);
+    color: var(--g2);
+    background: rgba(244,166,35,0.08);
+    transform: scale(1.15);
+  }
+  .cart-btn.added { border-color: var(--g3); color: var(--g2); background: rgba(244,166,35,0.12); }
+
+  .delete-btn {
+    width: 24px; height: 24px;
+    border-radius: 4px; border: none;
+    background: transparent; cursor: pointer;
+    color: var(--border); font-size: 0.85rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .delete-btn:hover { color: #a03020; background: rgba(160,48,32,0.1); }
+
+  .add-row {
+    display: flex; gap: 0.5rem;
+    padding: 0.55rem 1.25rem 0.7rem;
+    border-top: 1px dashed var(--border);
+    flex-wrap: wrap;
+  }
+  .add-row input {
+    flex: 1; min-width: 120px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.35rem 0.65rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    outline: none;
+    background: var(--bg);
+    color: var(--text);
+    transition: border 0.15s;
+  }
+  .add-row input:focus { border-color: var(--g4); }
+  .add-row button {
+    padding: 0.35rem 0.85rem;
+    border-radius: 4px;
+    border: 1px solid var(--g4);
+    background: transparent;
+    color: var(--g2);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .add-row button:hover { background: rgba(244,166,35,0.08); }
+
+  .hidden { display: none; }
+
+  .loading {
+    text-align: center;
+    padding: 3rem;
+    color: var(--muted);
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+  }
+
+  /* ── TOAST ── */
+  #toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: #151005;
+    color: var(--g1);
+    border: 1px solid var(--g4);
+    padding: 0.55rem 1.4rem;
+    border-radius: 4px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    z-index: 9999;
+    transition: transform 0.3s ease;
+    white-space: nowrap;
+    box-shadow: 0 4px 20px rgba(244,166,35,0.15);
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ── ÉPICERIE ── */
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-style: italic;
+    font-size: 1.5rem;
+    letter-spacing: 0.08em;
+    color: var(--g2);
+    margin-bottom: 1.2rem;
+  }
+
+  .add-epicerie { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+  .add-epicerie input {
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.55rem 1rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    outline: none;
+    background: var(--panel);
+    color: var(--text);
+    transition: border 0.15s;
+  }
+  .add-epicerie input:focus { border-color: var(--g4); }
+  .add-epicerie button {
+    padding: 0.55rem 1rem;
+    border-radius: 4px;
+    border: 1px solid var(--g4);
+    background: transparent;
+    color: var(--g2);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .add-epicerie button:hover { background: rgba(244,166,35,0.08); }
+
+  .btn-clear {
+    background: transparent;
+    color: #a03020;
+    border: 1px solid #3a1a10;
+    border-radius: 4px;
+    padding: 0.45rem 1rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    margin: 0.75rem 0;
+    transition: all 0.15s;
+  }
+  .btn-clear:hover { background: rgba(160,48,32,0.08); border-color: #a03020; }
+
+  .epicerie-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.65rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  .epicerie-item:hover { background: var(--panel2); }
+  .epicerie-item input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--g3); }
+  .epicerie-item label { flex: 1; font-size: 0.82rem; cursor: pointer; color: var(--g0); }
+  .epicerie-item label.checked { text-decoration: line-through; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div id="toast"></div>
+
+<!-- AUTH -->
+<div id="auth-screen">
+  <div class="auth-logo">
+    <span class="auth-eyebrow">Cuisine</span>
+    <span class="auth-hq">HQ</span>
+  </div>
+  <div class="auth-rule">
+    <div class="auth-rule-line"></div>
+    <div class="auth-rule-gem"></div>
+    <div class="auth-rule-line r"></div>
+  </div>
+  <div class="auth-tagline">Tout ce qu'il faut pour bien cuisiner.</div>
+  <button class="btn-google" id="btn-login">
+    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+    Connexion avec Google
+  </button>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <nav class="topnav">
+    <div class="topnav-logo">
+      <span class="topnav-eyebrow">Cuisine</span>
+      <span class="topnav-hq">HQ</span>
+    </div>
+    <div class="topnav-user">
+      <img class="user-avatar" id="user-avatar" src="" alt="">
+      <button class="btn-logout" id="btn-logout">Déconnexion</button>
+    </div>
+  </nav>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="congelateur">❄️ Congélateur</button>
+    <button class="tab" data-tab="frigo">🥬 Frigo</button>
+    <button class="tab" data-tab="gardmanger">🥫 Garde-Manger</button>
+    <button class="tab" data-tab="epicerie">🛒 Épicerie</button>
+  </div>
+
+  <div class="content">
+    <div class="section active" id="tab-congelateur">
+      <div id="congelateur-content"><div class="loading">Chargement...</div></div>
+    </div>
+    <div class="section" id="tab-frigo">
+      <div id="frigo-content"><div class="loading">Chargement...</div></div>
+    </div>
+    <div class="section" id="tab-gardmanger">
+      <div id="gardmanger-content"><div class="loading">Chargement...</div></div>
+    </div>
+    <div class="section" id="tab-epicerie">
+      <div class="section-title">Liste d'Épicerie</div>
+      <div class="add-epicerie">
+        <input type="text" id="epicerie-input" placeholder="Ajouter un item..." />
+        <button onclick="addEpicerieItem()">+ Ajouter</button>
+      </div>
+      <button class="btn-clear" onclick="clearChecked()">🗑️ Effacer les cochés</button>
+      <div id="epicerie-list" class="category"></div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, addDoc, deleteDoc, updateDoc, getDocs }
+  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAuxEZ6GPLPSR_01vh7pIZU-HcaGL3fCbs",
+  authDomain: "cuisine-ff911.firebaseapp.com",
+  projectId: "cuisine-ff911",
+  storageBucket: "cuisine-ff911.firebasestorage.app",
+  messagingSenderId: "796308500895",
+  appId: "1:796308500895:web:4ef46abd88ac6514e70daa",
+  measurementId: "G-WSHMP0G0R5"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2200);
+}
+
+document.getElementById('btn-login').onclick = () => signInWithPopup(auth, new GoogleAuthProvider());
+document.getElementById('btn-logout').onclick = () => signOut(auth);
+
+onAuthStateChanged(auth, user => {
+  if (user) {
+    document.getElementById('auth-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('user-avatar').src = user.photoURL || '';
+    loadAll(user.uid);
+  } else {
+    document.getElementById('auth-screen').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+  }
+});
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.onclick = () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+  };
+});
+
+const DEFAULT_DATA = {
+  congelateur: {
+    boeuf: { label: "🥩 Bœuf", color: "#5c1a0e", items: [
+      { name: "Steak Haché Bœuf", qty: 5, unit: "sac ziploc" },
+      { name: "Cubes de Bœuf", qty: 4, unit: "unité" },
+      { name: "Boulette Hamburger", qty: 1, unit: "unité" },
+      { name: "Boulettes Ryan", qty: 4, unit: "unité" },
+      { name: "Boulettes Éric", qty: 4, unit: "unité" },
+      { name: "Bifteck Attendri", qty: 2, unit: "unité" },
+      { name: "Steaks Minutes", qty: 10, unit: "unité" },
+      { name: "Rôti Contre-Filet", qty: 2, unit: "unité" },
+      { name: "Rôti Haut de Surlonge Désossé Régulier", qty: 1, unit: "unité" },
+      { name: "Fondue", qty: 1, unit: "unité" },
+      { name: "Tournedos", qty: 1, unit: "unité" },
+    ]},
+    porc: { label: "🐷 Porc", color: "#5c3010", items: [
+      { name: "Filet de Porc", qty: 1, unit: "filet" },
+      { name: "Paquets de Bacon", qty: 5, unit: "paquet" },
+      { name: "Pepperoni", qty: 1, unit: "petit ziploc" },
+      { name: "Pepperoni Épicé", qty: 3, unit: "petit ziploc" },
+      { name: "Porc haché", qty: 3, unit: "unité" },
+    ]},
+    poulet: { label: "🍗 Poulet", color: "#5c4a00", items: [
+      { name: "Poitrines de Poulet", qty: 6, unit: "unité" },
+      { name: "Hauts de Cuisse de Poulet", qty: 6, unit: "unité" },
+      { name: "Cuisses de Poulet", qty: 2, unit: "unité" },
+      { name: "Ailes de Poulet (Sélection)", qty: 2, unit: "boîte" },
+      { name: "Poulet Pop Corn", qty: 20, unit: "unité" },
+      { name: "Poulet Médaillon Bacon", qty: 0, unit: "unité" },
+    ]},
+    poisson: { label: "🐟 Poisson", color: "#0e2e40", items: [
+      { name: "Filets de Sole", qty: 4, unit: "unité" },
+    ]},
+    sauces: { label: "🍝 Plats / Sauces", color: "#0e3020", items: [
+      { name: "Sauce à Spaghetti", qty: 1, unit: "pot ziploc" },
+      { name: "Coulis de Tomate", qty: 5, unit: "petit ziploc" },
+      { name: "Soupe aux Légumes", qty: 1, unit: "pot ziploc" },
+      { name: "Sauce brune", qty: 1, unit: "unité" },
+    ]},
+  },
+  frigo: {
+    legumes: { label: "🥬 Légumes & Fruits", color: "#0e3020", items: [] },
+    laitiers: { label: "🧀 Produits Laitiers", color: "#5c4a00", items: [] },
+    autres: { label: "🍳 Autres", color: "#2a1f05", items: [] },
+  },
+  gardmanger: {
+    epices: { label: "🧂 Épices & Herbes", color: "#163020", items: [
+      { name: "Sel Windsor", qty: 1, unit: "canette" },
+      { name: "Poivre noir moulu", qty: 1, unit: "sachet" },
+      { name: "Poivre de Cayenne broyé", qty: 1, unit: "pot" },
+      { name: "Sel de céleri", qty: 1, unit: "sachet" },
+      { name: "Fleur de sel", qty: 1, unit: "pot" },
+      { name: "Paprika", qty: 2, unit: "sachet" },
+      { name: "Paprika fumé", qty: 1, unit: "pot" },
+      { name: "Poudre d'ail", qty: 2, unit: "sachet" },
+      { name: "Poudre d'oignon", qty: 1, unit: "sachet" },
+      { name: "Curcuma moulu", qty: 1, unit: "sachet" },
+      { name: "Muscade moulue", qty: 2, unit: "sachet" },
+      { name: "Clou de girofle moulu", qty: 1, unit: "sachet" },
+      { name: "Cannelle bâtonnets", qty: 1, unit: "sachet" },
+      { name: "Cumin moulu", qty: 1, unit: "sachet" },
+      { name: "Curry powder", qty: 2, unit: "sachet" },
+      { name: "Basilic", qty: 1, unit: "pot" },
+      { name: "Thym", qty: 2, unit: "pot" },
+      { name: "Origan", qty: 1, unit: "sachet" },
+      { name: "Fines herbes", qty: 1, unit: "pot" },
+      { name: "Sauge moulue", qty: 1, unit: "pot" },
+      { name: "Graines de céleri", qty: 1, unit: "pot" },
+      { name: "Ciboulette lyophilisée", qty: 1, unit: "sachet" },
+      { name: "Persil en flocons", qty: 1, unit: "sachet" },
+      { name: "Feuilles de laurier", qty: 2, unit: "sachet" },
+      { name: "4 épices", qty: 1, unit: "pot" },
+      { name: "Herbamare", qty: 1, unit: "pot" },
+    ]},
+    assaisonnements: { label: "🌶️ Assaisonnements & Mélanges", color: "#3a1008", items: [
+      { name: "La Grille Poulet", qty: 1, unit: "pot" },
+      { name: "La Grille Montreal Steak", qty: 1, unit: "pot" },
+      { name: "La Grille Saumon", qty: 1, unit: "pot" },
+      { name: "Assaisonnement Grec", qty: 1, unit: "pot" },
+      { name: "Bruschetta", qty: 1, unit: "pot" },
+      { name: "Beurre à l'ail", qty: 1, unit: "pot" },
+      { name: "Aneth", qty: 1, unit: "pot" },
+      { name: "Assaisonnement Italien", qty: 1, unit: "sachet" },
+      { name: "Poudre de chili", qty: 1, unit: "sachet" },
+      { name: "Gravy mix porc French's", qty: 1, unit: "sachet" },
+      { name: "Simili-bacon en miettes", qty: 1, unit: "sachet" },
+    ]},
+    conserves: { label: "🥫 Conserves & Sauces", color: "#3a2008", items: [
+      { name: "Maïs en grains", qty: 2, unit: "canette" },
+      { name: "Jus de tomate", qty: 1, unit: "canette" },
+      { name: "Sauce tomate", qty: 3, unit: "canette" },
+      { name: "Sauce poutine St-Hubert", qty: 2, unit: "canette" },
+      { name: "Sauce poutine St-Hubert sachet", qty: 1, unit: "sachet" },
+      { name: "Sauce poutine Esta", qty: 1, unit: "canette" },
+      { name: "Sauce pizza Mike's", qty: 5, unit: "pot" },
+      { name: "Sirop d'érable Irrésistible", qty: 1, unit: "canette" },
+    ]},
+    condiments: { label: "🫙 Condiments & Huiles", color: "#1a0e30", items: [
+      { name: "Sauce Worcestershire Lea & Perrins", qty: 2, unit: "bouteille" },
+      { name: "Huile de sésame", qty: 1, unit: "bouteille" },
+      { name: "Bovril bœuf", qty: 1, unit: "bouteille" },
+      { name: "Épice-riz Pilaf", qty: 1, unit: "bouteille" },
+      { name: "Sauce soya Lee Kum Kee", qty: 1, unit: "bouteille" },
+      { name: "Huile végétale", qty: 2, unit: "bouteille" },
+      { name: "Huile d'olive extra vierge", qty: 2, unit: "bouteille" },
+      { name: "Huile de tournesol", qty: 1, unit: "bouteille" },
+    ]},
+    tartinades: { label: "🥜 Tartinades & Collations", color: "#0e2e10", items: [
+      { name: "Beurre d'arachide Kraft Smooth", qty: 2, unit: "pot" },
+      { name: "Nutella", qty: 2, unit: "pot" },
+      { name: "Cookies & Cream spread", qty: 1, unit: "pot" },
+      { name: "Goldfish Explosion de pizza", qty: 2, unit: "boîte" },
+    ]},
+    boulangerie: { label: "🍞 Boulangerie & Divers", color: "#1a1505", items: [
+      { name: "Levure sèche Fleischmann's", qty: 4, unit: "sachet" },
+    ]},
+  }
+};
+
+async function loadAll(uid) {
+  for (const section of ['congelateur', 'frigo', 'gardmanger']) {
+    const ref = doc(db, 'users', uid, 'inventaire', section);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) await setDoc(ref, DEFAULT_DATA[section]);
+    onSnapshot(ref, d => { if (d.exists()) renderSection(section, d.data(), uid); });
+  }
+  loadEpicerie(uid);
+}
+
+async function addToEpicerie(uid, itemName) {
+  const ref = collection(db, 'users', uid, 'epicerie');
+  const snap = await getDocs(ref);
+  const existe = snap.docs.some(d => d.data().name.toLowerCase() === itemName.toLowerCase());
+  if (existe) { showToast(`⚠️ "${itemName}" déjà dans la liste`); return; }
+  await addDoc(ref, { name: itemName, checked: false });
+  showToast(`🛒 "${itemName}" ajouté à l'épicerie`);
+}
+
+function renderSection(section, data, uid) {
+  const container = document.getElementById(section + '-content');
+  container.innerHTML = '';
+  for (const [catKey, cat] of Object.entries(data)) {
+    const div = document.createElement('div');
+    div.className = 'category';
+
+    const header = document.createElement('div');
+    header.className = 'cat-header';
+    header.style.background = cat.color;
+    header.innerHTML = `<span>${cat.label}</span><span class="toggle">▲</span>`;
+    header.onclick = () => {
+      body.classList.toggle('hidden');
+      header.querySelector('.toggle').textContent = body.classList.contains('hidden') ? '▼' : '▲';
+    };
+
+    const body = document.createElement('div');
+    body.className = 'cat-body';
+
+    (cat.items || []).forEach((item, idx) => {
+      const row = document.createElement('div');
+      row.className = 'item';
+      row.innerHTML = `
+        <span class="item-name">${item.name}</span>
+        <span class="item-unit">${item.unit || ''}</span>
+        <div class="qty-controls">
+          <button class="qty-btn minus">−</button>
+          <span class="qty-value ${item.qty === 0 ? 'zero' : ''}">${item.qty}</span>
+          <button class="qty-btn plus">+</button>
+        </div>
+        <button class="cart-btn" title="Ajouter à l'épicerie">🛒</button>
+        <button class="delete-btn">✕</button>
+      `;
+      row.querySelector('.minus').onclick = () => updateQty(uid, section, catKey, data, idx, -1);
+      row.querySelector('.plus').onclick  = () => updateQty(uid, section, catKey, data, idx, 1);
+      row.querySelector('.delete-btn').onclick = () => {
+        if (confirm(`Supprimer "${item.name}" ?`)) deleteItem(uid, section, catKey, data, idx);
+      };
+      const cartBtn = row.querySelector('.cart-btn');
+      cartBtn.onclick = async () => {
+        await addToEpicerie(uid, item.name);
+        cartBtn.classList.add('added');
+        setTimeout(() => cartBtn.classList.remove('added'), 2000);
+      };
+      body.appendChild(row);
+    });
+
+    const addRow = document.createElement('div');
+    addRow.className = 'add-row';
+    addRow.innerHTML = `
+      <input type="text" placeholder="Ajouter un item..." class="add-name"/>
+      <input type="text" placeholder="unité" style="width:80px;" class="add-unit"/>
+      <button>+ Ajouter</button>
+    `;
+    addRow.querySelector('button').onclick = () => {
+      const name = addRow.querySelector('.add-name').value.trim();
+      const unit = addRow.querySelector('.add-unit').value.trim();
+      if (!name) return;
+      const newItems = [...(data[catKey].items || []), { name, qty: 1, unit }];
+      saveCategory(uid, section, catKey, data, newItems);
+      addRow.querySelector('.add-name').value = '';
+      addRow.querySelector('.add-unit').value = '';
+    };
+
+    body.appendChild(addRow);
+    div.appendChild(header);
+    div.appendChild(body);
+    container.appendChild(div);
+  }
+}
+
+async function updateQty(uid, section, catKey, data, idx, delta) {
+  const items = [...data[catKey].items];
+  items[idx] = { ...items[idx], qty: Math.max(0, items[idx].qty + delta) };
+  saveCategory(uid, section, catKey, data, items);
+}
+
+async function deleteItem(uid, section, catKey, data, idx) {
+  const items = data[catKey].items.filter((_, i) => i !== idx);
+  saveCategory(uid, section, catKey, data, items);
+}
+
+async function saveCategory(uid, section, catKey, data, newItems) {
+  const ref = doc(db, 'users', uid, 'inventaire', section);
+  await updateDoc(ref, { [`${catKey}.items`]: newItems });
+}
+
+let epicerieUid = null;
+function loadEpicerie(uid) {
+  epicerieUid = uid;
+  onSnapshot(collection(db, 'users', uid, 'epicerie'), snap => {
+    const list = document.getElementById('epicerie-list');
+    list.innerHTML = '';
+    snap.forEach(d => {
+      const item = d.data();
+      const row = document.createElement('div');
+      row.className = 'epicerie-item';
+      const id = `chk-${d.id}`;
+      row.innerHTML = `
+        <input type="checkbox" id="${id}" ${item.checked ? 'checked' : ''}/>
+        <label for="${id}" class="${item.checked ? 'checked' : ''}">${item.name}</label>
+        <button class="delete-btn" style="color:var(--muted)">✕</button>
+      `;
+      row.querySelector('input').onchange = async (e) => {
+        await updateDoc(doc(db, 'users', uid, 'epicerie', d.id), { checked: e.target.checked });
+      };
+      row.querySelector('.delete-btn').onclick = async () => {
+        await deleteDoc(doc(db, 'users', uid, 'epicerie', d.id));
+      };
+      list.appendChild(row);
+    });
+  });
+}
+
+window.addEpicerieItem = async () => {
+  const input = document.getElementById('epicerie-input');
+  const name = input.value.trim();
+  if (!name || !epicerieUid) return;
+  await addDoc(collection(db, 'users', epicerieUid, 'epicerie'), { name, checked: false });
+  input.value = '';
+};
+
+window.clearChecked = async () => {
+  const items = await getDocs(collection(db, 'users', epicerieUid, 'epicerie'));
+  items.forEach(async d => { if (d.data().checked) await deleteDoc(d.ref); });
+};
+
+document.getElementById('epicerie-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') window.addEpicerieItem();
+});
+</script>
+</body>
+</html>
