@@ -560,31 +560,59 @@ async function loadAll(uid) {
   initDefaultRecettes(uid);
 }
 
+// Recettes par défaut — chacune a un slug unique pour éviter les doublons
+const DEFAULT_RECETTES = [
+  {
+    _slug: "sauce-spaghetti-eric",
+    nom: "Sauce à Spaghetti Maison — Version Éric",
+    notes: "Faire revenir l'ail et les oignons. Ajouter les viandes et cuire. Ajouter tous les autres ingrédients et laisser mijoter 2-3h à feu doux. Retirer les feuilles de laurier avant de servir.",
+    ingredients: [
+      { nom: "Bœuf haché", qty: 1, unit: "lb" },
+      { nom: "Veau haché", qty: 1, unit: "lb" },
+      { nom: "Tomates en boîte", qty: 1, unit: "boîte 796ml" },
+      { nom: "Jus de tomate", qty: 1, unit: "boîte 796ml" },
+      { nom: "Pâte de tomates", qty: 1, unit: "boîte 156ml" },
+      { nom: "Sauce tomate", qty: 1, unit: "boîte 398ml" },
+      { nom: "Ail", qty: 3, unit: "gousses" },
+      { nom: "Oignons", qty: 3, unit: "unité" },
+      { nom: "Piment vert ou rouge", qty: 1, unit: "unité" },
+      { nom: "Branches de céleri", qty: 3, unit: "unité" },
+      { nom: "Assaisonnement Italien", qty: 2, unit: "c. à table" },
+      { nom: "Sel Windsor", qty: 1, unit: "c. à table" },
+      { nom: "Poivre noir moulu", qty: 1, unit: "c. à table" },
+      { nom: "Piment fort", qty: 0, unit: "au goût" },
+      { nom: "Feuilles de laurier", qty: 3, unit: "unité" },
+    ]
+  },
+  {
+    _slug: "biscuits-beurre-arachide-kraft",
+    nom: "Biscuits au beurre d'arachide KRAFT à l'ancienne",
+    notes: "CHAUFFER le four à 350°F. Mélanger la farine, la poudre à pâte, le bicarbonate et le sel ; réserver. Battre le beurre d'arachide, le beurre, la cassonade et le sucre dans un grand bol au batteur électrique, jusqu'à ce que le mélange soit léger et mousseux. Incorporer les œufs et la vanille. Ajouter graduellement le mélange à base de farine. DÉPOSER la pâte par cuillerées à soupe sur des plaques graissées, à 2 pouces d'intervalle. Aplatir en croisillons avec une fourchette. CUIRE 8 à 10 min jusqu'à dorés. Laisser refroidir 5 min.",
+    ingredients: [
+      { nom: "Farine", qty: 2.5, unit: "tasses" },
+      { nom: "Poudre à pâte Magic", qty: 1, unit: "c. à thé" },
+      { nom: "Bicarbonate de soude", qty: 1, unit: "c. à thé" },
+      { nom: "Sel Windsor", qty: 0.5, unit: "c. à thé" },
+      { nom: "Beurre", qty: 1, unit: "tasse" },
+      { nom: "Beurre d'arachide Kraft Smooth", qty: 1, unit: "tasse" },
+      { nom: "Cassonade", qty: 1, unit: "tasse" },
+      { nom: "Sucre granulé", qty: 1, unit: "tasse" },
+      { nom: "Œufs", qty: 2, unit: "unité" },
+      { nom: "Vanille", qty: 1, unit: "c. à thé" },
+    ]
+  },
+];
+
 async function initDefaultRecettes(uid) {
   const ref = collection(db, 'users', uid, 'recettes');
   const snap = await getDocs(ref);
-  if (snap.size === 0) {
-    await addDoc(ref, {
-      nom: "Sauce à Spaghetti Maison — Version Éric",
-      notes: "Faire revenir l'ail et les oignons. Ajouter les viandes et cuire. Ajouter tous les autres ingrédients et laisser mijoter 2-3h à feu doux. Retirer les feuilles de laurier avant de servir.",
-      ingredients: [
-        { nom: "Bœuf haché", qty: 1, unit: "lb" },
-        { nom: "Veau haché", qty: 1, unit: "lb" },
-        { nom: "Tomates en boîte", qty: 1, unit: "boîte 796ml" },
-        { nom: "Jus de tomate", qty: 1, unit: "boîte 796ml" },
-        { nom: "Pâte de tomates", qty: 1, unit: "boîte 156ml" },
-        { nom: "Sauce tomate", qty: 1, unit: "boîte 398ml" },
-        { nom: "Ail", qty: 3, unit: "gousses" },
-        { nom: "Oignons", qty: 3, unit: "unité" },
-        { nom: "Piment vert ou rouge", qty: 1, unit: "unité" },
-        { nom: "Branches de céleri", qty: 3, unit: "unité" },
-        { nom: "Assaisonnement Italien", qty: 2, unit: "c. à table" },
-        { nom: "Sel Windsor", qty: 1, unit: "c. à table" },
-        { nom: "Poivre noir moulu", qty: 1, unit: "c. à table" },
-        { nom: "Piment fort", qty: 0, unit: "au goût" },
-        { nom: "Feuilles de laurier", qty: 3, unit: "unité" },
-      ]
-    });
+  // Recueillir les slugs déjà en Firebase
+  const existingSlugs = snap.docs.map(d => d.data()._slug).filter(Boolean);
+  // Ajouter seulement les recettes manquantes
+  for (const recette of DEFAULT_RECETTES) {
+    if (!existingSlugs.includes(recette._slug)) {
+      await addDoc(ref, recette);
+    }
   }
 }
 
