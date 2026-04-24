@@ -494,6 +494,35 @@ async function loadAll(uid) {
   });
   loadEpicerie(uid);
   loadRecettes(uid);
+  initDefaultRecettes(uid);
+}
+
+async function initDefaultRecettes(uid) {
+  const ref = collection(db, 'users', uid, 'recettes');
+  const snap = await getDocs(ref);
+  if (snap.size === 0) {
+    await addDoc(ref, {
+      nom: "Sauce à Spaghetti Maison — Version Éric",
+      notes: "Faire revenir l'ail et les oignons. Ajouter les viandes et cuire. Ajouter tous les autres ingrédients et laisser mijoter 2-3h à feu doux. Retirer les feuilles de laurier avant de servir.",
+      ingredients: [
+        { nom: "Bœuf haché", qty: 1, unit: "lb" },
+        { nom: "Veau haché", qty: 1, unit: "lb" },
+        { nom: "Tomates en boîte", qty: 1, unit: "boîte 796ml" },
+        { nom: "Jus de tomate", qty: 1, unit: "boîte 796ml" },
+        { nom: "Pâte de tomates", qty: 1, unit: "boîte 156ml" },
+        { nom: "Sauce tomate", qty: 1, unit: "boîte 398ml" },
+        { nom: "Ail", qty: 3, unit: "gousses" },
+        { nom: "Oignons", qty: 3, unit: "unité" },
+        { nom: "Piment vert ou rouge", qty: 1, unit: "unité" },
+        { nom: "Branches de céleri", qty: 3, unit: "unité" },
+        { nom: "Assaisonnement Italien", qty: 2, unit: "c. à table" },
+        { nom: "Sel Windsor", qty: 1, unit: "c. à table" },
+        { nom: "Poivre noir moulu", qty: 1, unit: "c. à table" },
+        { nom: "Piment fort", qty: 0, unit: "au goût" },
+        { nom: "Feuilles de laurier", qty: 3, unit: "unité" },
+      ]
+    });
+  }
 }
 
 // ── RENDER ALIMENTS ──
