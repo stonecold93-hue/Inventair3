@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="14" fill="#080601"/>
+  <rect width="64" height="64" rx="14" fill="url(#bg)"/>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#120d02"/>
+      <stop offset="100%" stop-color="#080601"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFF8E7"/>
+      <stop offset="25%" stop-color="#F9E07F"/>
+      <stop offset="60%" stop-color="#F4A623"/>
+      <stop offset="100%" stop-color="#C47D0E"/>
+    </linearGradient>
+    <linearGradient id="gold2" x1="0" y1="0" x2="0" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#F9E07F"/>
+      <stop offset="50%" stop-color="#F4A623"/>
+      <stop offset="100%" stop-color="#8A5600"/>
+    </linearGradient>
+  </defs>
+  <!-- Border -->
+  <rect x="1.5" y="1.5" width="61" height="61" rx="13" fill="none" stroke="url(#gold2)" stroke-width="1"/>
+  <!-- C letter italic style -->
+  <text x="10" y="46" font-family="Georgia, serif" font-size="28" font-style="italic" font-weight="300" fill="url(#gold)">C</text>
+  <!-- HQ bold -->
+  <text x="28" y="46" font-family="Georgia, serif" font-size="22" font-weight="700" fill="url(#gold)">HQ</text>
+  <!-- thin line -->
+  <line x1="10" y1="50" x2="54" y2="50" stroke="#8A5600" stroke-width="0.5"/>
+</svg>
