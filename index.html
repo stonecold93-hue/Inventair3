@@ -683,10 +683,12 @@ window.ouvrirFormRecette = () => {
   document.getElementById('rec-notes').value = '';
   document.getElementById('ing-list').innerHTML = '';
   ajouterIngredient();
+  document.getElementById('modal-detail').classList.add('hidden');
   document.getElementById('modal-form').classList.remove('hidden');
 };
 
 function editRecette(id) {
+  document.getElementById('modal-detail').classList.add('hidden');
   const rec = recettesData[id];
   editingRecetteId = id;
   document.getElementById('modal-form-title').textContent = 'Modifier la recette';
@@ -763,6 +765,7 @@ window.sauvegarderRecette = async () => {
 
 // ── VOIR RECETTE + VÉRIF STOCK ──
 function voirRecette(id) {
+  document.getElementById('modal-form').classList.add('hidden');
   const rec = recettesData[id];
   document.getElementById('detail-title').textContent = rec.nom;
   document.getElementById('detail-notes').textContent = rec.notes || '';
