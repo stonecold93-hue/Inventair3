@@ -617,7 +617,7 @@ document.querySelectorAll('.tab').forEach(tab => {
   tab.onclick = () => goTab(tab.dataset.tab);
 });
 
-function goTab(tabName) {
+window.goTab = function(tabName) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   const tabBtn = document.querySelector(`.tab[data-tab="${tabName}"]`);
