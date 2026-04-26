@@ -474,8 +474,9 @@
           <input type="password" id="api-key-input" placeholder="Clé API Anthropic (sk-ant-...)" 
             style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:0.4rem 0.7rem;font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--text);outline:none"
             oninput="saveApiKey(this.value)"/>
-          <span style="font-size:0.6rem;color:var(--muted)">🔒 Local</span>
+          <button onclick="saveApiKeyBtn()" style="padding:0.4rem 0.7rem;border-radius:4px;border:1px solid var(--g4);background:transparent;color:var(--g2);font-family:'DM Mono',monospace;font-size:0.7rem;cursor:pointer;">💾 Sauver</button>
         </div>
+        <div id="api-key-status" style="font-size:0.65rem;color:var(--muted);"></div>
         <div class="home-scan-actions">
           <label class="btn-gold home-scan-btn" for="scan-file-input">
             📷 Prendre une photo
@@ -1354,15 +1355,34 @@ window.homeSearch = (query) => {
 };
 
 window.saveApiKey = (key) => {
-  if (key.startsWith('sk-ant-')) localStorage.setItem('chq_api_key', key);
+  if (key.startsWith('sk-ant-')) {
+    localStorage.setItem('chq_api_key', key);
+  }
+};
+
+window.saveApiKeyBtn = () => {
+  const input = document.getElementById('api-key-input');
+  const status = document.getElementById('api-key-status');
+  const key = input.value.trim();
+  if (key.startsWith('sk-ant-')) {
+    localStorage.setItem('chq_api_key', key);
+    status.textContent = '✅ Clé sauvegardée !';
+    status.style.color = 'var(--g2)';
+  } else {
+    status.textContent = '❌ Clé invalide — doit commencer par sk-ant-';
+    status.style.color = '#a03020';
+  }
 };
 
 // Charger la clé sauvegardée
 setTimeout(() => {
   const saved = localStorage.getItem('chq_api_key');
-  if (saved) {
-    const input = document.getElementById('api-key-input');
-    if (input) input.value = saved;
+  const input = document.getElementById('api-key-input');
+  const status = document.getElementById('api-key-status');
+  if (saved && input) {
+    input.value = saved;
+    status.textContent = '✅ Clé active';
+    status.style.color = 'var(--g2)';
   }
 }, 500);
 
