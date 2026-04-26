@@ -821,7 +821,22 @@ async function loadAll(uid) {
 
   onSnapshot(ref, d => {
     if (d.exists()) {
-      renderAliments(d.data(), uid);
+      // Sauvegarder position scroll et catégories ouvertes
+      const scrollY = window.scrollY;
+      const openCats = {};
+      document.querySelectorAll('#aliments-content .category').forEach(cat => {
+        const key = cat.dataset.catkey;
+        const body = cat.querySelector('.cat-body');
+        if (key && body) openCats[key] = !body.classList.contains('hidden');
+      });
+
+      renderAliments(d.data(), uid, openCats);
+
+      // Restaurer scroll après rendu
+      requestAnimationFrame(() => {
+        window.scrollTo(0, scrollY);
+      });
+
       // Mettre à jour allItems pour autocomplete
       allItems = [];
       for (const cat of Object.values(d.data())) {
@@ -852,10 +867,10 @@ const DEFAULT_RECETTES = [
       { nom: "Jus de tomate", qty: 1, unit: "boîte 796ml" },
       { nom: "Pâte de tomates", qty: 1, unit: "boîte 156ml" },
       { nom: "Sauce tomate", qty: 1, unit: "boîte 398ml" },
-      { nom: "Ail", qty: 3, unit: "gousses" },
+      { nom: "Poudre d'ail", qty: 3, unit: "gousses" },
       { nom: "Oignon", qty: 3, unit: "unité" },
       { nom: "Piment vert ou rouge", qty: 1, unit: "unité" },
-      { nom: "Branches de céleri", qty: 3, unit: "unité" },
+      { nom: "Céleri", qty: 3, unit: "unité" },
       { nom: "Assaisonnement Italien", qty: 2, unit: "c. à table" },
       { nom: "Sel", qty: 1, unit: "c. à table" },
       { nom: "Poivre noir moulu", qty: 1, unit: "c. à table" },
@@ -1023,7 +1038,7 @@ async function initDefaultRecettes(uid) {
 }
 
 // ── RENDER ALIMENTS ──
-function renderAliments(data, uid) {
+function renderAliments(data, uid, openCats = {}) {
   const container = document.getElementById('aliments-content');
   container.innerHTML = '';
   buildCatFilters(data);
@@ -1037,6 +1052,12 @@ function renderAliments(data, uid) {
     header.innerHTML = `<span>${cat.label}</span><span class="toggle">▲</span>`;
     const body = document.createElement('div');
     body.className = 'cat-body';
+    // Restaurer état ouvert/fermé
+    const wasOpen = openCats[catKey] !== undefined ? openCats[catKey] : true;
+    if (!wasOpen) {
+      body.classList.add('hidden');
+      header.querySelector('.toggle').textContent = '▼';
+    }
     header.onclick = () => {
       body.classList.toggle('hidden');
       header.querySelector('.toggle').textContent = body.classList.contains('hidden') ? '▼' : '▲';
