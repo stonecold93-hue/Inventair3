@@ -472,8 +472,8 @@
         <div class="home-scan-sub">Prenez une photo de vos achats ou d'un reçu — l'IA les ajoute à votre inventaire</div>
         <div style="display:flex;gap:0.4rem;align-items:center">
           <input type="password" id="api-key-input" placeholder="Clé API Anthropic (sk-ant-...)" 
-            style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:0.4rem 0.7rem;font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--text);outline:none"
-            oninput="saveApiKey(this.value)"/>
+            style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:0.4rem 0.7rem;font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--text);outline:none"/>
+          <button onclick="toggleApiKeyVisible()" id="api-key-eye" style="padding:0.4rem 0.5rem;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:0.75rem;cursor:pointer;">👁</button>
           <button onclick="saveApiKeyBtn()" style="padding:0.4rem 0.7rem;border-radius:4px;border:1px solid var(--g4);background:transparent;color:var(--g2);font-family:'DM Mono',monospace;font-size:0.7rem;cursor:pointer;">💾 Sauver</button>
         </div>
         <div id="api-key-status" style="font-size:0.65rem;color:var(--muted);"></div>
@@ -836,6 +836,7 @@ async function loadAll(uid) {
   loadEpicerie(uid);
   loadRecettes(uid);
   initDefaultRecettes(uid);
+  loadApiKey(uid);
 }
 
 // Recettes par défaut — chacune a un slug unique pour éviter les doublons
@@ -1354,37 +1355,64 @@ window.homeSearch = (query) => {
   results.classList.remove('hidden');
 };
 
-window.saveApiKey = (key) => {
-  if (key.startsWith('sk-ant-')) {
-    localStorage.setItem('chq_api_key', key);
-  }
+window.toggleApiKeyVisible = () => {
+  const input = document.getElementById('api-key-input');
+  input.type = input.type === 'password' ? 'text' : 'password';
 };
 
-window.saveApiKeyBtn = () => {
+window.saveApiKey = (key) => {
+  if (key.startsWith('sk-ant-')) localStorage.setItem('chq_api_key', key);
+};
+
+window.saveApiKeyBtn = async () => {
   const input = document.getElementById('api-key-input');
   const status = document.getElementById('api-key-status');
   const key = input.value.trim();
-  if (key.startsWith('sk-ant-')) {
-    localStorage.setItem('chq_api_key', key);
-    status.textContent = '✅ Clé sauvegardée !';
-    status.style.color = 'var(--g2)';
-  } else {
+  if (!key.startsWith('sk-ant-')) {
     status.textContent = '❌ Clé invalide — doit commencer par sk-ant-';
     status.style.color = '#a03020';
+    return;
   }
+  // Sauvegarder dans localStorage ET Firebase
+  localStorage.setItem('chq_api_key', key);
+  if (currentUid) {
+    try {
+      await setDoc(doc(db, 'users', currentUid, 'settings', 'apikey'), { key }, { merge: true });
+      status.textContent = '✅ Clé sauvegardée sur tous vos appareils !';
+    } catch(e) {
+      status.textContent = '✅ Clé sauvegardée localement';
+    }
+  } else {
+    status.textContent = '✅ Clé sauvegardée !';
+  }
+  status.style.color = 'var(--g2)';
+  input.type = 'password';
 };
 
-// Charger la clé sauvegardée
-setTimeout(() => {
-  const saved = localStorage.getItem('chq_api_key');
+async function loadApiKey(uid) {
   const input = document.getElementById('api-key-input');
   const status = document.getElementById('api-key-status');
-  if (saved && input) {
+  if (!input) return;
+  // Essayer Firebase d'abord
+  try {
+    const snap = await getDoc(doc(db, 'users', uid, 'settings', 'apikey'));
+    if (snap.exists() && snap.data().key) {
+      const key = snap.data().key;
+      input.value = key;
+      localStorage.setItem('chq_api_key', key);
+      status.textContent = '✅ Clé active';
+      status.style.color = 'var(--g2)';
+      return;
+    }
+  } catch(e) {}
+  // Sinon localStorage
+  const saved = localStorage.getItem('chq_api_key');
+  if (saved) {
     input.value = saved;
-    status.textContent = '✅ Clé active';
+    status.textContent = '✅ Clé active (locale)';
     status.style.color = 'var(--g2)';
   }
-}, 500);
+}
 
 window.clearHomeSearch = () => {
   document.getElementById('home-search-input').value = '';
@@ -1411,8 +1439,8 @@ window.scanPhoto = async (input) => {
       r.readAsDataURL(file);
     });
 
-    // Clé API
-    const apiKey = localStorage.getItem('chq_api_key') || document.getElementById('api-key-input').value;
+    // Clé API — Firebase ou localStorage
+    const apiKey = document.getElementById('api-key-input').value.trim() || localStorage.getItem('chq_api_key');
     if (!apiKey) {
       status.textContent = "⚠️ Entrez votre clé API Anthropic d'abord";
       return;
