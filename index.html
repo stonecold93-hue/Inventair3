@@ -18,9 +18,35 @@
   /* ── AUTH ── */
   #auth-screen {
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    min-height: 100vh; gap: 1.8rem; padding: 2rem;
+    min-height: 100vh; padding: 2rem;
     background: radial-gradient(ellipse at center, #120d02 0%, #080601 70%);
+    position: relative; overflow: hidden;
   }
+  #auth-screen::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(ellipse, #F4A62306 0%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  .auth-card {
+    display: flex; flex-direction: column; align-items: center; gap: 1.8rem;
+    background: #0e0b02;
+    border: 1px solid var(--g4);
+    border-radius: 12px;
+    padding: 3rem 2.5rem;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 0 60px rgba(244,166,35,0.08);
+    z-index: 1;
+  }
+  .auth-divider {
+    display: flex; align-items: center; gap: 1rem; width: 100%;
+  }
+  .auth-divider-line { flex: 1; height: 1px; background: var(--border); }
+  .auth-divider-text { font-size: 0.65rem; letter-spacing: 0.15em; color: var(--muted); text-transform: uppercase; }
   .auth-wm { display: flex; flex-direction: column; align-items: center; gap: 12px; }
   .auth-wm-orn { display: flex; align-items: center; gap: 10px; }
   .auth-wm-orn-line { width: 48px; height: 0.5px; background: var(--g4); }
@@ -241,7 +267,7 @@
   .stock-cart { background: transparent; border: 1px solid var(--g4); border-radius: 4px; padding: 0.2rem 0.5rem; color: var(--g2); font-size: 0.65rem; cursor: pointer; transition: all 0.15s; font-family: 'DM Mono', monospace; }
   .stock-cart:hover { background: rgba(244,166,35,0.1); }
   .recette-detail-title { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 600; color: var(--g1); margin-bottom: 0.3rem; }
-  .recette-detail-notes { font-size: 0.78rem; color: var(--muted); font-style: italic; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+  .recette-detail-notes { font-size: 0.78rem; color: var(--g0); font-style: italic; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); line-height: 1.6; }
 </style>
 </head>
 <body>
@@ -250,30 +276,40 @@
 
 <!-- AUTH -->
 <div id="auth-screen">
-  <div class="auth-wm">
-    <div class="auth-wm-orn">
-      <div class="auth-wm-orn-line"></div>
-      <div class="auth-wm-orn-gem"></div>
-      <div class="auth-wm-orn-line"></div>
+  <div class="auth-card">
+    <div class="auth-wm">
+      <div class="auth-wm-orn">
+        <div class="auth-wm-orn-line"></div>
+        <div class="auth-wm-orn-gem"></div>
+        <div class="auth-wm-orn-line"></div>
+      </div>
+      <div class="auth-wm-logotype">
+        <span class="auth-wm-cuisine">Cuisine</span>
+        <div class="auth-wm-separator"></div>
+        <span class="auth-wm-hq">HQ</span>
+      </div>
+      <div class="auth-wm-bottom">
+        <div class="auth-wm-btm-line"></div>
+        <div class="auth-wm-btm-dot"></div>
+        <span class="auth-wm-btm-text">Headquarters</span>
+        <div class="auth-wm-btm-dot"></div>
+        <div class="auth-wm-btm-line"></div>
+      </div>
     </div>
-    <div class="auth-wm-logotype">
-      <span class="auth-wm-cuisine">Cuisine</span>
-      <div class="auth-wm-separator"></div>
-      <span class="auth-wm-hq">HQ</span>
+    <div class="auth-tagline">Tout ce qu'il faut pour bien cuisiner.</div>
+    <div class="auth-divider">
+      <div class="auth-divider-line"></div>
+      <span class="auth-divider-text">Connexion</span>
+      <div class="auth-divider-line"></div>
     </div>
-    <div class="auth-wm-bottom">
-      <div class="auth-wm-btm-line"></div>
-      <div class="auth-wm-btm-dot"></div>
-      <span class="auth-wm-btm-text">Headquarters</span>
-      <div class="auth-wm-btm-dot"></div>
-      <div class="auth-wm-btm-line"></div>
+    <button class="btn-google" id="btn-login">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+      Continuer avec Google
+    </button>
+    <div style="font-size:0.6rem;color:var(--muted);text-align:center;letter-spacing:0.05em;">
+      Accès privé — vos données sont sécurisées
     </div>
   </div>
-  <div class="auth-tagline">Tout ce qu'il faut pour bien cuisiner.</div>
-  <button class="btn-google" id="btn-login">
-    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
-    Connexion avec Google
-  </button>
 </div>
 
 <!-- APP -->
@@ -431,6 +467,23 @@ document.querySelectorAll('.tab').forEach(tab => {
 
 // ── DEFAULT DATA ──
 const SECTIONS = {
+  frigo: { label: "🧊 Frigo", color: "#0e2a3a", items: [
+    { name: "Lait", qty: 0, unit: "unité" },
+    { name: "Œuf", qty: 0, unit: "unité" },
+    { name: "Beurre", qty: 0, unit: "unité" },
+    { name: "Margarine", qty: 0, unit: "unité" },
+    { name: "Fromage en barre", qty: 0, unit: "unité" },
+    { name: "Fromage en grains", qty: 0, unit: "unité" },
+    { name: "Concombre", qty: 0, unit: "unité" },
+    { name: "Carotte", qty: 0, unit: "unité" },
+    { name: "Oignon", qty: 0, unit: "unité" },
+    { name: "Piment rouge", qty: 0, unit: "unité" },
+    { name: "Piment vert", qty: 0, unit: "unité" },
+    { name: "Champignon", qty: 0, unit: "unité" },
+    { name: "Peace Tea pêche thé glacé", qty: 0, unit: "canette" },
+    { name: "Peace Tea framboise thé glacé", qty: 0, unit: "canette" },
+    { name: "Réhausseur de café vanille", qty: 0, unit: "bouteille" },
+  ]},
   viandes: { label: "🥩 Viandes", color: "#5c1a0e", items: [
     { name: "Bœuf haché", qty: 5, unit: "sac ziploc" },
     { name: "Cubes de Bœuf", qty: 4, unit: "unité" },
@@ -448,20 +501,18 @@ const SECTIONS = {
     { name: "Pepperoni", qty: 1, unit: "petit ziploc" },
     { name: "Pepperoni Épicé", qty: 3, unit: "petit ziploc" },
     { name: "Porc haché", qty: 3, unit: "unité" },
-  ]},
-  viandes: { label: "🥩 Viandes", color: "#5c1a0e", items: [
-    { name: "Lait", qty: 5, unit: "sac" },
-    { name: "Oeuf", qty: 4, unit: "unité" },
-    { name: "Beurre", qty: 1, unit: "unité" },
+    { name: "Jambon fumé", qty: 0, unit: "unité" },
+    { name: "Bologne", qty: 0, unit: "unité" },
+    { name: "Tourtière", qty: 0, unit: "unité" },
   ]},
   volaille: { label: "🍗 Volaille & Poisson", color: "#5c4a00", items: [
-    { name: "Poitrines de Poulet", qty: 6, unit: "unité" },
-    { name: "Hauts de Cuisse de Poulet", qty: 6, unit: "unité" },
-    { name: "Cuisses de Poulet", qty: 2, unit: "unité" },
+    { name: "Poitrine de Poulet", qty: 6, unit: "unité" },
+    { name: "Haut de Cuisse de Poulet", qty: 6, unit: "unité" },
+    { name: "Cuisse de Poulet", qty: 2, unit: "unité" },
     { name: "Ailes de Poulet", qty: 2, unit: "boîte" },
     { name: "Poulet Pop Corn", qty: 20, unit: "unité" },
     { name: "Poulet Médaillon Bacon", qty: 0, unit: "unité" },
-    { name: "Filets de Sole", qty: 4, unit: "unité" },
+    { name: "Filet de Sole", qty: 4, unit: "unité" },
   ]},
   platssauces: { label: "🍝 Plats & Sauces Maison", color: "#0e3020", items: [
     { name: "Sauce à Spaghetti", qty: 1, unit: "pot ziploc" },
@@ -477,20 +528,28 @@ const SECTIONS = {
     { name: "Sauce poutine St-Hubert sachet", qty: 1, unit: "sachet" },
     { name: "Sauce poutine Esta", qty: 1, unit: "canette" },
     { name: "Sauce pizza Mike's", qty: 5, unit: "pot" },
-    { name: "Sirop d'érable Irrésistible", qty: 1, unit: "canette" },
+    { name: "Sirop d'érable", qty: 1, unit: "canette" },
+    { name: "Bouillon de poulet", qty: 0, unit: "boîte" },
+    { name: "Bouillon de bœuf", qty: 0, unit: "boîte" },
+    { name: "Bouillon pour fondue", qty: 0, unit: "boîte" },
+    { name: "Tomate en boîte", qty: 0, unit: "boîte 796ml" },
+    { name: "Pâte de tomates", qty: 0, unit: "boîte 156ml" },
   ]},
   condiments: { label: "🫙 Condiments & Huiles", color: "#1a0e30", items: [
-    { name: "Sauce Worcestershire Lea & Perrins", qty: 2, unit: "bouteille" },
+    { name: "Sauce Worcestershire", qty: 2, unit: "bouteille" },
     { name: "Huile de sésame", qty: 1, unit: "bouteille" },
     { name: "Bovril bœuf", qty: 1, unit: "bouteille" },
     { name: "Épice-riz Pilaf", qty: 1, unit: "bouteille" },
-    { name: "Sauce soya Lee Kum Kee", qty: 1, unit: "bouteille" },
+    { name: "Sauce soya", qty: 1, unit: "bouteille" },
     { name: "Huile végétale", qty: 2, unit: "bouteille" },
     { name: "Huile d'olive extra vierge", qty: 2, unit: "bouteille" },
     { name: "Huile de tournesol", qty: 1, unit: "bouteille" },
+    { name: "Ketchup", qty: 0, unit: "bouteille" },
+    { name: "Moutarde de Dijon", qty: 0, unit: "pot" },
+    { name: "Vinaigre de cidre", qty: 0, unit: "bouteille" },
   ]},
   epices: { label: "🧂 Épices & Herbes", color: "#163020", items: [
-    { name: "Sel Windsor", qty: 1, unit: "canette" },
+    { name: "Sel", qty: 1, unit: "canette" },
     { name: "Poivre noir moulu", qty: 1, unit: "sachet" },
     { name: "Poivre de Cayenne broyé", qty: 1, unit: "pot" },
     { name: "Sel de céleri", qty: 1, unit: "sachet" },
@@ -516,6 +575,10 @@ const SECTIONS = {
     { name: "Feuilles de laurier", qty: 2, unit: "sachet" },
     { name: "4 épices", qty: 1, unit: "pot" },
     { name: "Herbamare", qty: 1, unit: "pot" },
+    { name: "Épice BBQ", qty: 0, unit: "pot" },
+    { name: "Chapelure Italienne", qty: 0, unit: "boîte" },
+    { name: "Cacao", qty: 0, unit: "boîte" },
+    { name: "Fécule de maïs", qty: 0, unit: "boîte" },
   ]},
   assaisonnements: { label: "🌶️ Assaisonnements & Mélanges", color: "#3a1008", items: [
     { name: "La Grille Poulet", qty: 1, unit: "pot" },
@@ -530,14 +593,36 @@ const SECTIONS = {
     { name: "Gravy mix porc French's", qty: 1, unit: "sachet" },
     { name: "Simili-bacon en miettes", qty: 1, unit: "sachet" },
   ]},
+  patessecs: { label: "🍝 Pâtes & Céréales", color: "#2a1a05", items: [
+    { name: "Spaghettini", qty: 0, unit: "boîte" },
+    { name: "Spaghetti", qty: 0, unit: "boîte" },
+    { name: "Lasagne", qty: 0, unit: "boîte" },
+    { name: "Macaroni coude", qty: 0, unit: "boîte" },
+    { name: "Farine à pain", qty: 0, unit: "sac" },
+    { name: "Farine", qty: 0, unit: "sac" },
+    { name: "Flocons d'avoine", qty: 0, unit: "boîte" },
+  ]},
+  patisserie: { label: "🍰 Pâtisserie & Desserts", color: "#2a0a20", items: [
+    { name: "Sucre granulé", qty: 0, unit: "sac" },
+    { name: "Cassonade", qty: 0, unit: "sac" },
+    { name: "Poudre à pâte", qty: 0, unit: "boîte" },
+    { name: "Bicarbonate de soude", qty: 0, unit: "boîte" },
+    { name: "Vanille", qty: 0, unit: "bouteille" },
+    { name: "Essence d'amande", qty: 0, unit: "bouteille" },
+    { name: "Extrait d'orange pur", qty: 0, unit: "bouteille" },
+    { name: "Essence de rhum", qty: 0, unit: "bouteille" },
+    { name: "Pépites de chocolat", qty: 0, unit: "sac" },
+    { name: "Pomme de terre", qty: 0, unit: "unité" },
+  ]},
   tartinades: { label: "🥜 Tartinades & Collations", color: "#0e2e10", items: [
-    { name: "Beurre d'arachide Kraft Smooth", qty: 2, unit: "pot" },
+    { name: "Beurre d'arachide Kraft", qty: 2, unit: "pot" },
     { name: "Nutella", qty: 2, unit: "pot" },
     { name: "Cookies & Cream spread", qty: 1, unit: "pot" },
     { name: "Goldfish Explosion de pizza", qty: 2, unit: "boîte" },
   ]},
   boulangerie: { label: "🍞 Boulangerie & Divers", color: "#1a1505", items: [
-    { name: "Levure sèche Fleischmann's", qty: 4, unit: "sachet" },
+    { name: "Levure sèche active", qty: 4, unit: "sachet" },
+    { name: "Levure machine à pain", qty: 0, unit: "pot" },
   ]},
 };
 
@@ -600,16 +685,16 @@ const DEFAULT_RECETTES = [
     ingredients: [
       { nom: "Bœuf haché", qty: 1, unit: "lb" },
       { nom: "Veau haché", qty: 1, unit: "lb" },
-      { nom: "Tomates en boîte", qty: 1, unit: "boîte 796ml" },
+      { nom: "Tomate en boîte", qty: 1, unit: "boîte 796ml" },
       { nom: "Jus de tomate", qty: 1, unit: "boîte 796ml" },
       { nom: "Pâte de tomates", qty: 1, unit: "boîte 156ml" },
       { nom: "Sauce tomate", qty: 1, unit: "boîte 398ml" },
       { nom: "Ail", qty: 3, unit: "gousses" },
-      { nom: "Oignons", qty: 3, unit: "unité" },
+      { nom: "Oignon", qty: 3, unit: "unité" },
       { nom: "Piment vert ou rouge", qty: 1, unit: "unité" },
       { nom: "Branches de céleri", qty: 3, unit: "unité" },
       { nom: "Assaisonnement Italien", qty: 2, unit: "c. à table" },
-      { nom: "Sel Windsor", qty: 1, unit: "c. à table" },
+      { nom: "Sel", qty: 1, unit: "c. à table" },
       { nom: "Poivre noir moulu", qty: 1, unit: "c. à table" },
       { nom: "Piment fort", qty: 0, unit: "au goût" },
       { nom: "Feuilles de laurier", qty: 3, unit: "unité" },
@@ -621,13 +706,13 @@ const DEFAULT_RECETTES = [
     notes: "Option recommandée : Faire saisir le filet dans une poêle 2-3 minutes par côté. Déposer dans la mijoteuse avec les oignons autour. Mélanger la sauce et verser sur le porc. Cuisson LOW : 5 à 6 heures, HIGH : 3 à 4 heures.",
     ingredients: [
       { nom: "Filet de Porc", qty: 1, unit: "500-700g" },
-      { nom: "Sirop d'érable Irrésistible", qty: 0.33, unit: "tasse" },
-      { nom: "Sauce soya Lee Kum Kee", qty: 2, unit: "c. à soupe" },
+      { nom: "Sirop d'érable", qty: 0.33, unit: "tasse" },
+      { nom: "Sauce soya", qty: 2, unit: "c. à soupe" },
       { nom: "Moutarde de Dijon", qty: 1, unit: "c. à soupe" },
       { nom: "Cassonade", qty: 1, unit: "c. à soupe" },
       { nom: "Bouillon de poulet", qty: 0.5, unit: "tasse" },
       { nom: "Poudre d'ail", qty: 1, unit: "c. à thé" },
-      { nom: "Oignons", qty: 1, unit: "unité" },
+      { nom: "Oignon", qty: 1, unit: "unité" },
       { nom: "Poivre noir moulu", qty: 0, unit: "au goût" },
     ]
   },
@@ -638,10 +723,10 @@ const DEFAULT_RECETTES = [
     ingredients: [
       { nom: "Jambon fumé", qty: 1, unit: "2.5-4 kg" },
       { nom: "Bouillon de poulet", qty: 2, unit: "tasses" },
-      { nom: "Sirop d'érable Irrésistible", qty: 3, unit: "c. à soupe" },
-      { nom: "Sauce soya Lee Kum Kee", qty: 1, unit: "c. à soupe" },
-      { nom: "Oignons", qty: 1, unit: "unité" },
-      { nom: "Carottes", qty: 5, unit: "unité" },
+      { nom: "Sirop d'érable", qty: 3, unit: "c. à soupe" },
+      { nom: "Sauce soya", qty: 1, unit: "c. à soupe" },
+      { nom: "Oignon", qty: 1, unit: "unité" },
+      { nom: "Carotte", qty: 5, unit: "unité" },
       { nom: "Feuilles de laurier", qty: 2, unit: "unité" },
       { nom: "Poivre noir moulu", qty: 0, unit: "au goût" },
     ]
@@ -652,14 +737,14 @@ const DEFAULT_RECETTES = [
     notes: "Assaisonner le bœuf, former des boulettes et les dorer. Réserver. Faire revenir oignons et champignons dans le même chaudron. Remettre les boulettes, ajouter bouillon et Worcestershire, saupoudrer farine et poudre d'ail. Mijoter 10 min à feu doux. Ajouter les patates cuites, mijoter encore 5-8 min. Reposer 2 min avant de servir.",
     ingredients: [
       { nom: "Bœuf haché", qty: 500, unit: "g" },
-      { nom: "Oignons", qty: 1, unit: "unité" },
-      { nom: "Champignons", qty: 227, unit: "g" },
+      { nom: "Oignon", qty: 1, unit: "unité" },
+      { nom: "Champignon", qty: 227, unit: "g" },
       { nom: "Patates", qty: 5, unit: "unité" },
       { nom: "Bouillon de bœuf", qty: 2, unit: "tasses" },
-      { nom: "Sauce Worcestershire Lea & Perrins", qty: 1, unit: "c. à soupe" },
+      { nom: "Sauce Worcestershire", qty: 1, unit: "c. à soupe" },
       { nom: "Farine", qty: 1, unit: "c. à soupe" },
       { nom: "Poudre d'ail", qty: 0.5, unit: "c. à thé" },
-      { nom: "Sel Windsor", qty: 0, unit: "au goût" },
+      { nom: "Sel", qty: 0, unit: "au goût" },
       { nom: "Poivre noir moulu", qty: 0, unit: "au goût" },
       { nom: "Huile végétale", qty: 0, unit: "au goût" },
     ]
@@ -671,11 +756,11 @@ const DEFAULT_RECETTES = [
     ingredients: [
       { nom: "Beurre", qty: 4, unit: "c. à thé" },
       { nom: "Sucre granulé", qty: 0.75, unit: "tasse" },
-      { nom: "Poudre à pâte Magic", qty: 1.5, unit: "c. à thé" },
+      { nom: "Poudre à pâte", qty: 1.5, unit: "c. à thé" },
       { nom: "Lait", qty: 0.5, unit: "tasse" },
-      { nom: "Œufs", qty: 1, unit: "unité" },
+      { nom: "Œuf", qty: 1, unit: "unité" },
       { nom: "Farine", qty: 1, unit: "tasse" },
-      { nom: "Sel Windsor", qty: 0.5, unit: "c. à thé" },
+      { nom: "Sel", qty: 0.5, unit: "c. à thé" },
       { nom: "Vanille", qty: 1, unit: "c. à thé" },
       { nom: "Cassonade", qty: 1.5, unit: "tasse" },
       { nom: "Eau", qty: 1, unit: "tasse" },
@@ -688,13 +773,13 @@ const DEFAULT_RECETTES = [
     ingredients: [
       { nom: "Beurre", qty: 4, unit: "c. à thé" },
       { nom: "Sucre granulé", qty: 0.75, unit: "tasse" },
-      { nom: "Poudre à pâte Magic", qty: 1.5, unit: "c. à thé" },
+      { nom: "Poudre à pâte", qty: 1.5, unit: "c. à thé" },
       { nom: "Lait", qty: 0.5, unit: "tasse" },
-      { nom: "Œufs", qty: 1, unit: "unité" },
+      { nom: "Œuf", qty: 1, unit: "unité" },
       { nom: "Farine", qty: 1, unit: "tasse" },
-      { nom: "Sel Windsor", qty: 0.5, unit: "c. à thé" },
+      { nom: "Sel", qty: 0.5, unit: "c. à thé" },
       { nom: "Vanille", qty: 1, unit: "c. à thé" },
-      { nom: "Sirop d'érable Irrésistible", qty: 1.5, unit: "tasse" },
+      { nom: "Sirop d'érable", qty: 1.5, unit: "tasse" },
       { nom: "Eau", qty: 0.5, unit: "tasse" },
     ]
   },
@@ -705,12 +790,12 @@ const DEFAULT_RECETTES = [
     ingredients: [
       { nom: "Flocons d'avoine", qty: 1, unit: "tasse" },
       { nom: "Farine", qty: 0.75, unit: "tasse" },
-      { nom: "Sirop d'érable Irrésistible", qty: 0.33, unit: "tasse" },
+      { nom: "Sirop d'érable", qty: 0.33, unit: "tasse" },
       { nom: "Sucre granulé", qty: 0.25, unit: "tasse" },
       { nom: "Beurre", qty: 0.5, unit: "tasse" },
-      { nom: "Œufs", qty: 1, unit: "unité" },
-      { nom: "Poudre à pâte Magic", qty: 0.5, unit: "c. à thé" },
-      { nom: "Sel Windsor", qty: 1, unit: "pincée" },
+      { nom: "Œuf", qty: 1, unit: "unité" },
+      { nom: "Poudre à pâte", qty: 0.5, unit: "c. à thé" },
+      { nom: "Sel", qty: 1, unit: "pincée" },
     ]
   },
   {
@@ -721,9 +806,9 @@ const DEFAULT_RECETTES = [
       { nom: "Beurre", qty: 2, unit: "c. à soupe" },
       { nom: "Farine", qty: 2, unit: "c. à soupe" },
       { nom: "Bouillon de bœuf", qty: 2, unit: "tasses" },
-      { nom: "Sauce soya Lee Kum Kee", qty: 2, unit: "c. à thé" },
+      { nom: "Sauce soya", qty: 2, unit: "c. à thé" },
       { nom: "Ketchup", qty: 2, unit: "c. à thé" },
-      { nom: "Sauce Worcestershire Lea & Perrins", qty: 1, unit: "c. à thé" },
+      { nom: "Sauce Worcestershire", qty: 1, unit: "c. à thé" },
       { nom: "Poudre d'ail", qty: 2, unit: "pincées" },
       { nom: "Poudre d'oignon", qty: 2, unit: "pincées" },
       { nom: "Poivre noir moulu", qty: 0, unit: "au goût" },
@@ -738,8 +823,8 @@ const DEFAULT_RECETTES = [
       { nom: "Eau tiède", qty: 1.25, unit: "tasse" },
       { nom: "Huile d'olive extra vierge", qty: 2, unit: "c. à soupe" },
       { nom: "Sucre granulé", qty: 2, unit: "c. à thé" },
-      { nom: "Sel Windsor", qty: 1.5, unit: "c. à thé" },
-      { nom: "Levure sèche Fleischmann's", qty: 2, unit: "c. à thé" },
+      { nom: "Sel", qty: 1.5, unit: "c. à thé" },
+      { nom: "Levure sèche active", qty: 2, unit: "c. à thé" },
     ]
   },
   {
@@ -748,14 +833,14 @@ const DEFAULT_RECETTES = [
     notes: "CHAUFFER le four à 350°F. Mélanger la farine, la poudre à pâte, le bicarbonate et le sel ; réserver. Battre le beurre d'arachide, le beurre, la cassonade et le sucre dans un grand bol au batteur électrique, jusqu'à ce que le mélange soit léger et mousseux. Incorporer les œufs et la vanille. Ajouter graduellement le mélange à base de farine. DÉPOSER la pâte par cuillerées à soupe sur des plaques graissées, à 2 pouces d'intervalle. Aplatir en croisillons avec une fourchette. CUIRE 8 à 10 min jusqu'à dorés. Laisser refroidir 5 min.",
     ingredients: [
       { nom: "Farine", qty: 2.5, unit: "tasses" },
-      { nom: "Poudre à pâte Magic", qty: 1, unit: "c. à thé" },
+      { nom: "Poudre à pâte", qty: 1, unit: "c. à thé" },
       { nom: "Bicarbonate de soude", qty: 1, unit: "c. à thé" },
-      { nom: "Sel Windsor", qty: 0.5, unit: "c. à thé" },
+      { nom: "Sel", qty: 0.5, unit: "c. à thé" },
       { nom: "Beurre", qty: 1, unit: "tasse" },
-      { nom: "Beurre d'arachide Kraft Smooth", qty: 1, unit: "tasse" },
+      { nom: "Beurre d'arachide Kraft", qty: 1, unit: "tasse" },
       { nom: "Cassonade", qty: 1, unit: "tasse" },
       { nom: "Sucre granulé", qty: 1, unit: "tasse" },
-      { nom: "Œufs", qty: 2, unit: "unité" },
+      { nom: "Œuf", qty: 2, unit: "unité" },
       { nom: "Vanille", qty: 1, unit: "c. à thé" },
     ]
   },
@@ -1053,7 +1138,15 @@ function voirRecette(id) {
   const check = document.getElementById('stock-check');
   check.innerHTML = '';
   (rec.ingredients || []).forEach(ing => {
-    const stockItem = allItems.find(i => i.name.toLowerCase() === ing.nom.toLowerCase());
+    // Normalise pour comparer (pluriels, accents)
+  function normalise(s) {
+    return s.toLowerCase()
+      .normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .replace(/s$/, ''); // retire le s final pour gérer pluriels
+  }
+  const stockItem = allItems.find(i => normalise(i.name) === normalise(ing.nom) || 
+    i.name.toLowerCase().includes(ing.nom.toLowerCase()) ||
+    ing.nom.toLowerCase().includes(i.name.toLowerCase()));
     const enStock = stockItem && stockItem.qty > 0;
     const div = document.createElement('div');
     div.className = `stock-ing ${enStock ? 'ok' : 'manque'}`;
