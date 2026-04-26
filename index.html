@@ -1394,7 +1394,7 @@ window.scanPhoto = async (input) => {
     // Clé API
     const apiKey = localStorage.getItem('chq_api_key') || document.getElementById('api-key-input').value;
     if (!apiKey) {
-      status.textContent = '⚠️ Entrez votre clé API Anthropic d'abord';
+      status.textContent = "⚠️ Entrez votre clé API Anthropic d'abord";
       return;
     }
 
@@ -1430,7 +1430,7 @@ window.scanPhoto = async (input) => {
     const text = data.content[0].text.trim();
     let items;
     try { items = JSON.parse(text); }
-    catch { throw new Error('Réponse invalide de l'IA'); }
+    catch { throw new Error("Réponse invalide de l'IA"); }
 
     status.textContent = `✅ ${items.length} aliment(s) détecté(s) — confirmez avant d'ajouter :`;
 
