@@ -1,19 +1,32 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="14" fill="#020810"/>
   <defs>
-    <linearGradient id="blue" x1="0" y1="0" x2="0" y2="64" gradientUnits="userSpaceOnUse">
+    <linearGradient id="bg1" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#071428"/>
+      <stop offset="100%" stop-color="#020810"/>
+    </linearGradient>
+    <linearGradient id="bl" x1="0" y1="0" x2="0" y2="64" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#EFF8FF"/>
-      <stop offset="25%" stop-color="#BAE0FF"/>
-      <stop offset="60%" stop-color="#5AB4F0"/>
+      <stop offset="30%" stop-color="#BAE0FF"/>
+      <stop offset="65%" stop-color="#5AB4F0"/>
       <stop offset="100%" stop-color="#1A7EC4"/>
     </linearGradient>
-    <linearGradient id="blue2" x1="0" y1="0" x2="0" y2="64" gradientUnits="userSpaceOnUse">
+    <linearGradient id="bl2" x1="0" y1="0" x2="0" y2="64" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#5AB4F0"/>
       <stop offset="100%" stop-color="#0A4E84"/>
     </linearGradient>
   </defs>
-  <rect x="1.5" y="1.5" width="61" height="61" rx="13" fill="none" stroke="url(#blue2)" stroke-width="1"/>
-  <text x="8" y="46" font-family="Georgia, serif" font-size="26" font-style="italic" font-weight="300" fill="url(#blue)">K</text>
-  <text x="26" y="46" font-family="Georgia, serif" font-size="22" font-weight="700" fill="url(#blue)">HQ</text>
-  <line x1="8" y1="50" x2="56" y2="50" stroke="#0A4E84" stroke-width="0.5"/>
+  <rect width="64" height="64" rx="14" fill="url(#bg1)"/>
+  <rect x="1.5" y="1.5" width="61" height="61" rx="13" fill="none" stroke="url(#bl2)" stroke-width="1"/>
+  <!-- Cuillère fine gauche -->
+  <ellipse cx="14" cy="18" rx="4" ry="6" fill="none" stroke="url(#bl)" stroke-width="1.2" opacity="0.75"/>
+  <line x1="14" y1="24" x2="14" y2="50" stroke="url(#bl)" stroke-width="1.2" opacity="0.75"/>
+  <!-- Fourchette fine droite -->
+  <rect x="47" y="12" width="1" height="6" rx="0.3" fill="url(#bl)" opacity="0.75"/>
+  <rect x="49.5" y="12" width="1" height="6" rx="0.3" fill="url(#bl)" opacity="0.75"/>
+  <rect x="52" y="12" width="1" height="6" rx="0.3" fill="url(#bl)" opacity="0.75"/>
+  <path d="M47.5 18 Q50 21 50 24 L50 50 Q50 51 50.5 51 Q51 51 51 50 L51 24 Q51 21 50 18Z" fill="url(#bl)" opacity="0.75"/>
+  <!-- HQ grand centré -->
+  <text x="32" y="40" font-family="Georgia,serif" font-size="22" font-weight="700" fill="url(#bl)" text-anchor="middle">HQ</text>
+  <line x1="20" y1="46" x2="44" y2="46" stroke="url(#bl2)" stroke-width="0.5"/>
+  <text x="32" y="54" font-family="sans-serif" font-size="6" letter-spacing="2" fill="url(#bl2)" text-anchor="middle">KITCHEN</text>
 </svg>
